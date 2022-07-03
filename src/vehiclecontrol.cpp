@@ -157,10 +157,13 @@ float VehicleControl::ProcessThrottle()
 {
    float throtSpnt, finalSpnt;
 
-   if ((int)Encoder::GetSpeed() < Param::GetInt(Param::throtramprpm))
+   if ((int)Encoder::GetSpeed() < Param::GetInt(Param::throtramprpm)){
       Throttle::throttleRamp = Param::GetFloat(Param::throtramp);
-   else
+      Throttle::throttleRampLow = Param::GetFloat(Param::throtrampLow);
+      Throttle::throttleRampSwitch = Param::GetInt(Param::throtrampSwitch);
+   }else
       Throttle::throttleRamp = FP_TOFLOAT(Param::GetAttrib(Param::throtramp)->max);
+      //Throttle::throttleRamp = Param::GetFloat(Param::throtrampHighRPM);
 
    throtSpnt = GetUserThrottleCommand();
    bool determineDirection = GetCruiseCreepCommand(finalSpnt, throtSpnt);

@@ -130,22 +130,34 @@ void PwmGeneration::Run()
 
 void PwmGeneration::SetTorquePercent(float torquePercent)
 {
+   s32fp fwFrqStart = Param::Get(Param::fwFrqStart) ;
+   s32fp fwFrqMid = Param::Get(Param::fwFrqMid);
+   s32fp fwFrqEnd = Param::Get(Param::fwFrqEnd);
    float throtcur = Param::GetFloat(Param::throtcur);
    float idiqSplit = Param::GetFloat(Param::idiqsplit);
    float is = throtcur * torquePercent;
    float fwId = 0;
-   float fwIdMax = Param::GetFloat(Param::fwIdMax);
+   float fwIdMid = Param::GetFloat(Param::fwIdMid);
+   float fwIdEnd = Param::GetFloat(Param::fwIdEnd);
    int maxOverdrive = Param::GetInt(Param::overdrive);
 
    float fwIq = 0;
-   float fwIqMax = Param::GetFloat(Param::fwIqMax);
+   float fwIqMid = Param::GetFloat(Param::fwIqMid);
+   float fwIqEnd = Param::GetFloat(Param::fwIqEnd);
 
-   if(frq > Param::Get(Param::fwIdEnd)){
-      fwId = fwIdMax;
-      fwIq = fwIqMax;
-   }else if(frq > Param::Get(Param::fwIdStart)){
-      fwId = fwIdMax * (frq - Param::Get(Param::fwIdStart))/(Param::Get(Param::fwIdEnd)-Param::Get(Param::fwIdStart));
-      fwIq = fwIqMax * (frq - Param::Get(Param::fwIdStart))/(Param::Get(Param::fwIdEnd)-Param::Get(Param::fwIdStart));
+   static s32fp frqFiltered = 0;
+
+   frqFiltered = IIRFILTER(frqFiltered, frq, Param::GetInt(Param::fwfrqflt));
+   
+   if(frqFiltered > fwFrqEnd){ 
+      fwId = fwIdEnd;
+      fwIq = fwIqEnd;
+   }else if(frqFiltered > fwFrqMid){
+      fwId = fwIdMid + (fwIdEnd-fwIdMid) * (frqFiltered - fwFrqMid)/(fwFrqEnd-fwFrqMid);
+      fwIq = fwIqMid + (fwIqEnd-fwIqMid) * (frqFiltered - fwFrqMid)/(fwFrqEnd-fwFrqMid);
+   }else if(frqFiltered > fwFrqStart){
+      fwId = fwIdMid * (frqFiltered - fwFrqStart)/(fwFrqMid-fwFrqStart);
+      fwIq = fwIqMid * (frqFiltered - fwFrqStart)/(fwFrqMid-fwFrqStart);
    }else{
       fwId = 0;
       fwIq = 0;
@@ -178,7 +190,7 @@ void PwmGeneration::SetTorquePercent(float torquePercent)
    Param::SetFloat(Param::idReq, (FP_MUL(FP_FROMFLT(id),norm)));
    Param::SetFloat(Param::iqReq, iq);
 
-   s32fp iqRef = SIGN(torquePercent) * FP_MUL(FP_FROMFLT(ABS(iq)),norm);
+   s32fp iqRef = SIGN(torquePercent) * ABS(FP_MUL(FP_FROMFLT(ABS(iq)),norm));
    qController.SetRef(iqRef);
    dController.SetRef(FP_MUL(FP_FROMFLT(id),norm));
 }
@@ -276,12 +288,22 @@ void PwmGeneration::CalcNextAngleSync(int dir)
    {
       uint16_t syncOfs = Param::GetInt(Param::syncofs);
       uint16_t rotorAngle = Encoder::GetRotorAngle();
-      int syncadv = frqFiltered * Param::GetInt(Param::syncadv);
+      int syncadv = Param::GetInt(Param::syncadv);
+      int syncadvOff = Param::GetInt(Param::syncadvOffs);
+      
+      if(frq > Param::Get(Param::syncadvEnd)){
+         syncadv -= syncadvOff;
+         
+      }else if(frq > Param::Get(Param::syncadvStart)){
+         syncadv -= (syncadvOff * ((frq) - Param::Get(Param::syncadvStart))/(Param::Get(Param::syncadvEnd)-Param::Get(Param::syncadvStart)));
+      }
+      Param::SetInt(Param::syncAdvFinal, syncadv);
+      syncadv = frqFiltered * syncadv;
       syncadv = MAX(0, syncadv);
-
+      
       //Compensate rotor movement that happened between sampling and processing
       syncOfs += FP_TOINT(dir * syncadv);
-
+      Param::SetInt(Param::syncOffFinal, syncOfs);
       angle = polePairRatio * rotorAngle + syncOfs;
       frq = polePairRatio * Encoder::GetRotorFrequency();
    }

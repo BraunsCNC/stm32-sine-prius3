@@ -40,6 +40,8 @@ float Throttle::throtmax;
 float Throttle::throtmin;
 float Throttle::regenRamp;
 float Throttle::throttleRamp;
+float Throttle::throttleRampLow;
+int Throttle::throttleRampSwitch;
 float Throttle::throttleRamped;
 int Throttle::bmslimhigh;
 int Throttle::bmslimlow;
@@ -128,17 +130,33 @@ float Throttle::RampThrottle(float potnom)
    potnom = MIN(potnom, throtmax);
    potnom = MAX(potnom, throtmin);
 
-   if (potnom >= throttleRamped)
-   {
-      throttleRamped = RAMPUP(throttleRamped, potnom, throttleRamp);
-   }
-   else if (potnom < throttleRamped && throttleRamped > 5)
-   {
-      throttleRamped = RAMPDOWN(throttleRamped, potnom, throttleRamp);
-   }
-   else //potnom < throttleRamped && potnom <= 0
-   {
-      throttleRamped = RAMPDOWN(throttleRamped, potnom, regenRamp);
+   if(potnom >= throttleRampSwitch){
+
+      if (potnom >= throttleRamped)
+      {
+         throttleRamped = RAMPUP(throttleRamped, potnom, throttleRamp);
+      }
+      else if (potnom < throttleRamped && throttleRamped > 5)
+      {
+         throttleRamped = RAMPDOWN(throttleRamped, potnom, throttleRamp);
+      }
+      else //potnom < throttleRamped && potnom <= 0
+      {
+         throttleRamped = RAMPDOWN(throttleRamped, potnom, regenRamp);
+      }
+   } else{
+      if (potnom >= throttleRamped)
+      {
+         throttleRamped = RAMPUP(throttleRamped, potnom, throttleRampLow);
+      }
+      else if (potnom < throttleRamped && throttleRamped > 5)
+      {
+         throttleRamped = RAMPDOWN(throttleRamped, potnom, throttleRampLow);
+      }
+      else //potnom < throttleRamped && potnom <= 0
+      {
+         throttleRamped = RAMPDOWN(throttleRamped, potnom, regenRamp);
+      }
    }
 
    return throttleRamped;

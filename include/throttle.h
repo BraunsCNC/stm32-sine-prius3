@@ -54,6 +54,8 @@ class Throttle
       static float idleThrotLim;
       static float regenRamp;
       static float throttleRamp;
+      static float throttleRampLow;
+      static int throttleRampSwitch;
       static int bmslimhigh;
       static int bmslimlow;
       static int accelmax;

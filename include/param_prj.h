@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define VER 5.25.A
+#define VER 5.29.A
 
 /* Entries must be ordered as follows:
    1. Saveable parameters (id != 0)
    2. Temporary parameters (id = 0)
    3. Display values
  */
-//Next param id (increase when adding new parameter!): 149
-//Next value Id: 2052
+//Next param id (increase when adding new parameter!): 155
+//Next value Id: 2056
 /*              category     name         unit       min     max     default id */
 
 #define MOTOR_PARAMETERS_COMMON \
@@ -54,16 +54,23 @@
     PARAM_ENTRY(CAT_MOTOR,   curkpfrqgain,       "",        0,      1000,  0,     147 ) \
     PARAM_ENTRY(CAT_MOTOR,   curki,       "",        0,      100000, 20000,  108 ) \
     PARAM_ENTRY(CAT_MOTOR,   curkifrqgain,       "",        0,      1000,  0,     148 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwIdMax,   "",          -200,      200,  0,     143 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwIdStart,   "",        0,      1000,  200,     144 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwIdEnd,   "",          0,      1000,  400,     145 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwIqMax,   "",          -200,      200,  0,     141 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwIdMid,   "",          -200,      200,  0,     143 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwIdEnd,   "",          -200,      200,  0,     156 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwFrqStart,   "",        0,      1000,  200,     144 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwFrqMid,   "",          0,      1000,  400,     145 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwFrqEnd,   "",          0,      1000,  400,     155 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwIqMid,   "",          -200,      200,  0,     141 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwIqEnd,   "",          -200,      200,  0,     157 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwfrqflt,   "dig",          0,      12,  8,     152 ) \
     PARAM_ENTRY(CAT_MOTOR,   overdrive,   "",          0,      200,  100,     139 ) \
     PARAM_ENTRY(CAT_MOTOR,   negQLim,   "",          0,      1,  0,     146 ) \
     PARAM_ENTRY(CAT_MOTOR,   qmargin,     "dig",     0,      10000,  4000,   140 ) \
     PARAM_ENTRY(CAT_MOTOR,   idiqsplit,   "%",       0,      100,    50,     142 ) \
     PARAM_ENTRY(CAT_MOTOR,   syncofs,     "dig",     0,      65535,  0,      70  ) \
-    PARAM_ENTRY(CAT_MOTOR,   syncadv,     "dig/Hz",  0,      65535,  10,     133 )
+    PARAM_ENTRY(CAT_MOTOR,   syncadv,     "dig/Hz",  0,      65535,  10,     133 ) \
+    PARAM_ENTRY(CAT_MOTOR,   syncadvOffs,     "dig",     0,      65535,  0,      149  ) \
+    PARAM_ENTRY(CAT_MOTOR,   syncadvStart,     "",     0,      1000,  500,      150  ) \
+    PARAM_ENTRY(CAT_MOTOR,   syncadvEnd,     "",     0,      1000,  600,      151  ) 
 
 #define INVERTER_PARAMETERS_COMMON \
     PARAM_ENTRY(CAT_INVERTER,pwmfrq,      PWMFRQS,   0,      2,      1,      13  ) \
@@ -75,7 +82,7 @@
     PARAM_ENTRY(CAT_INVERTER,udcgain,     "dig/V",   0,      4095,   6.175,  29  ) \
     PARAM_ENTRY(CAT_INVERTER,udcofs,      "dig",     0,      4095,   0,      77  ) \
     PARAM_ENTRY(CAT_INVERTER,udclim,      "V",       0,      1000,   540,    48  ) \
-    PARAM_ENTRY(CAT_INVERTER,snshs,       SNS_HS,    0,      7,      0,      45  )
+    PARAM_ENTRY(CAT_INVERTER,snshs,       SNS_HS,    0,      8,      0,      45  )
 
 #define INVERTER_PARAMETERS_FOC \
     PARAM_ENTRY(CAT_INVERTER,pinswap,     SWAPS,     0,      15,     0,      109 )
@@ -115,6 +122,8 @@
     PARAM_ENTRY(CAT_THROTTLE,pot2max,     "dig",     0,      4095,   4095,   64  ) \
     PARAM_ENTRY(CAT_THROTTLE,potmode,     POTMODES,  0,      6,      0,      82  ) \
     PARAM_ENTRY(CAT_THROTTLE,throtramp,   "%/10ms",  0.1,    100,    100,    81  ) \
+    PARAM_ENTRY(CAT_THROTTLE,throtrampLow,   "%/10ms",  0.1,    100,    100,    153  ) \
+    PARAM_ENTRY(CAT_THROTTLE,throtrampSwitch,   "%",  0,    100,    50,    154  ) \
     PARAM_ENTRY(CAT_THROTTLE,throtramprpm,"rpm",     0,      20000,  20000,  85  )
 
 #define THROTTLE_PARAMETERS_SINE \
@@ -211,6 +220,8 @@
     VALUE_ENTRY(iAbs,     "A",     2054 ) \
     VALUE_ENTRY(ud,      "dig",   2046 ) \
     VALUE_ENTRY(uq,      "dig",   2047 ) \
+    VALUE_ENTRY(syncAdvFinal,      "dig",   2055 ) \
+    VALUE_ENTRY(syncOffFinal,      "dig",   2056 ) \
 
 #if CONTROL == CTRL_SINE
 #define PARAM_LIST \
@@ -257,7 +268,7 @@
 #define PWMPOLS      "0=ActHigh, 1=ActLow"
 #define DIRS         "-1=Reverse, 0=Neutral, 1=Forward"
 #define TRIPMODES    "0=AllOff, 1=DcSwOn, 2=PrechargeOn, 3=AutoResume"
-#define SNS_HS       "0=JCurve, 1=Semikron, 2=MBB600, 3=KTY81, 4=PT1000, 5=NTCK45_2k2, 6=Leaf, 7=BMW-i3"
+#define SNS_HS       "0=JCurve, 1=Semikron, 2=MBB600, 3=KTY81, 4=PT1000, 5=NTCK45_2k2, 6=Leaf, 7=BMW-i3, 8=Prius3"
 #define SNS_M        "12=KTY83-110, 13=KTY84-130, 14=Leaf, 15=KTY81-110, 16=Toyota, 21=OutlanderFront, 22=EpcosB57861-S, 23=ToyotaGen2"
 #define PWMFUNCS     "0=tmpm, 1=tmphs, 2=speed, 3=speedfrq"
 #define BTNSWITCH    "0=Button, 1=Switch, 2=CAN"

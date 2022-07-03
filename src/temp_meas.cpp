@@ -37,6 +37,9 @@ typedef struct TempSensor
    const uint16_t *lookup;
 } TEMP_SENSOR;
 
+/* Temp sensor Prius3 */
+static const uint16_t Prius3[] = { PRIUS3 };
+
 /* Temp sensor with JCurve */
 static const uint16_t JCurve[] = { JCURVE };
 
@@ -99,6 +102,7 @@ static const uint16_t epcosb57861[] = { EPCOSB57861 };
 
 static const TEMP_SENSOR sensors[] =
 {
+   { 0, 115, 5,  TABLEN(Prius3),         NTC, Prius3     },
    { -25, 105, 5,  TABLEN(JCurve),         NTC, JCurve     },
    { 0,   100, 5,  TABLEN(Semikron),       PTC, Semikron   },
    { -5,  100, 5,  TABLEN(mbb600),         PTC, mbb600     },

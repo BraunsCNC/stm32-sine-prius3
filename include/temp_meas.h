@@ -32,7 +32,8 @@ public:
       TEMP_NTCK45 = 5, /*hier muss ein NTC K45 2k2 verwendet werden, der mit einem Parallelwiderstand mit 2k verschaltet wird. Achtung: Der Parallelwiderstand ist im Schaltplan und Layout nicht vorhanden! */
       TEMP_LEAFHS = 6,
       TEMP_BMWI3HS = 7,
-      NUM_HS_SENSORS = 8,
+      TEMP_PRIUS3 = 8,
+      NUM_HS_SENSORS = 9,
       TEMP_KTY83 = 12,
       TEMP_KTY84 = 13,
       TEMP_LEAF = 14,
@@ -53,6 +54,34 @@ public:
 
 
 #ifdef __TEMP_LU_TABLES
+#define PRIUS3 \
+3995	,\
+3861	,\
+3727	,\
+3596	,\
+3467	,\
+3343	,\
+3220	,\
+3102	,\
+2987	,\
+2875	,\
+2770	,\
+2666	,\
+2568	,\
+2473	,\
+2382	,\
+2294	,\
+2211	,\
+2131	,\
+2054	,\
+1982	,\
+1912	,\
+1845	,\
+1782	,\
+1722	
+	
+
+
 #define JCURVE \
 57	,\
 76	,\
