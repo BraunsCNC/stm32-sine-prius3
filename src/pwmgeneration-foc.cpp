@@ -136,6 +136,13 @@ void PwmGeneration::SetTorquePercent(float torquePercent)
    float throtcur = Param::GetFloat(Param::throtcur);
    float idiqSplit = Param::GetFloat(Param::idiqsplit);
    float is = throtcur * torquePercent;
+
+   static s32fp voltageFiltered = 0;
+   voltageFiltered = IIRFILTER(voltageFiltered, Param::Get(Param::udc), Param::GetInt(Param::voltagefrqflt)); 
+   float maxVoltage = Param::Get(Param::maxVoltage);
+   float voltageOffset = Param::Get(Param::voltageOffset);
+   float fwIqEndOffset = Param::GetFloat(Param::fwIqEndOffset);
+
    float fwId = 0;
    float fwIdMid = Param::GetFloat(Param::fwIdMid);
    float fwIdEnd = Param::GetFloat(Param::fwIdEnd);
@@ -145,10 +152,19 @@ void PwmGeneration::SetTorquePercent(float torquePercent)
    float fwIqMid = Param::GetFloat(Param::fwIqMid);
    float fwIqEnd = Param::GetFloat(Param::fwIqEnd);
 
+   if(voltageFiltered < maxVoltage-voltageOffset){
+      fwIqEnd = fwIqEnd + fwIqEndOffset;
+   }else if(voltageFiltered < maxVoltage){
+      fwIqEnd = fwIqEnd + fwIqEndOffset * (maxVoltage - voltageFiltered)/(voltageOffset);
+   }else{
+      fwIqEnd = fwIqEnd;
+   }
+
+
    static s32fp frqFiltered = 0;
 
    frqFiltered = IIRFILTER(frqFiltered, frq, Param::GetInt(Param::fwfrqflt));
-   
+
    if(frqFiltered > fwFrqEnd){ 
       fwId = fwIdEnd;
       fwIq = fwIqEnd;
@@ -165,6 +181,7 @@ void PwmGeneration::SetTorquePercent(float torquePercent)
 
    Param::SetFloat(Param::ifw, fwId);
    Param::SetFloat(Param::ifwq, fwIq);
+   Param::SetFloat(Param::fwIqEndFinal, fwIqEnd);
 
    float id = idiqSplit * is / 100.0f;
    id = -ABS(id) - fwId; 
@@ -184,11 +201,11 @@ void PwmGeneration::SetTorquePercent(float torquePercent)
       norm = FP_DIV(FP_FROMFLT(is), iAbs );
    }
 
-   Param::SetFloat(Param::iAbs, FP_TOFLOAT(iAbs));
-   Param::SetFloat(Param::norm, FP_TOFLOAT(norm));
-   Param::SetFloat(Param::is, is);
-   Param::SetFloat(Param::idReq, (FP_MUL(FP_FROMFLT(id),norm)));
-   Param::SetFloat(Param::iqReq, iq);
+   //Param::SetFloat(Param::iAbs, FP_TOFLOAT(iAbs));
+   //Param::SetFloat(Param::norm, FP_TOFLOAT(norm));
+   //Param::SetFloat(Param::is, is);
+   //Param::SetFloat(Param::idReq, (FP_MUL(FP_FROMFLT(id),norm)));
+   //Param::SetFloat(Param::iqReq, iq);
 
    s32fp iqRef = SIGN(torquePercent) * ABS(FP_MUL(FP_FROMFLT(ABS(iq)),norm));
    qController.SetRef(iqRef);

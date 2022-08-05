@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define VER 5.29.A
+#define VER 5.30.A
 
 /* Entries must be ordered as follows:
    1. Saveable parameters (id != 0)
    2. Temporary parameters (id = 0)
    3. Display values
  */
-//Next param id (increase when adding new parameter!): 155
-//Next value Id: 2056
+//Next param id (increase when adding new parameter!): 162
+//Next value Id: 2058
 /*              category     name         unit       min     max     default id */
 
 #define MOTOR_PARAMETERS_COMMON \
@@ -54,14 +54,18 @@
     PARAM_ENTRY(CAT_MOTOR,   curkpfrqgain,       "",        0,      1000,  0,     147 ) \
     PARAM_ENTRY(CAT_MOTOR,   curki,       "",        0,      100000, 20000,  108 ) \
     PARAM_ENTRY(CAT_MOTOR,   curkifrqgain,       "",        0,      1000,  0,     148 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwIdMid,   "",          -200,      200,  0,     143 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwIdEnd,   "",          -200,      200,  0,     156 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwFrqStart,   "",        0,      1000,  200,     144 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwFrqMid,   "",          0,      1000,  400,     145 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwFrqEnd,   "",          0,      1000,  400,     155 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwIqMid,   "",          -200,      200,  0,     141 ) \
-    PARAM_ENTRY(CAT_MOTOR,   fwIqEnd,   "",          -200,      200,  0,     157 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwIdMid,   "A",          -200,      200,  50,     143 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwIdEnd,   "A",          -200,      200,  20,     156 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwFrqStart,   "Hz",        0,      1000,  350,     144 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwFrqMid,   "Hz",          0,      1000,  550,     145 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwFrqEnd,   "Hz",          0,      1000,  750,     155 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwIqMid,   "A",          -200,      200,  80,     141 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwIqEnd,   "A",          -200,      200,  50,     157 ) \
     PARAM_ENTRY(CAT_MOTOR,   fwfrqflt,   "dig",          0,      12,  8,     152 ) \
+    PARAM_ENTRY(CAT_MOTOR,   maxVoltage,   "V",          0,      1000,  365,     158 ) \
+    PARAM_ENTRY(CAT_MOTOR,   voltageOffset,   "V",          0,      200,  5,     159 ) \
+    PARAM_ENTRY(CAT_MOTOR,   fwIqEndOffset,   "A",          0,      50,  8,     160 ) \
+    PARAM_ENTRY(CAT_MOTOR,   voltagefrqflt,   "dig",          0,      50,  8,     161 ) \
     PARAM_ENTRY(CAT_MOTOR,   overdrive,   "",          0,      200,  100,     139 ) \
     PARAM_ENTRY(CAT_MOTOR,   negQLim,   "",          0,      1,  0,     146 ) \
     PARAM_ENTRY(CAT_MOTOR,   qmargin,     "dig",     0,      10000,  4000,   140 ) \
@@ -213,6 +217,7 @@
     VALUE_ENTRY(iq,      "A",     2004 ) \
     VALUE_ENTRY(ifw,     "A",     2048 ) \
     VALUE_ENTRY(ifwq,     "A",     2049 ) \
+    VALUE_ENTRY(fwIqEndFinal,     "A",     2057 ) \
     VALUE_ENTRY(norm,     "",     2050 ) \
     VALUE_ENTRY(is,     "A",     2051 ) \
     VALUE_ENTRY(idReq,     "A",     2052 ) \
